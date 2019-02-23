@@ -7,14 +7,18 @@ const PORT = process.env.PORT || 3001;
 const path = require('path');
 
 require('dotenv').config();
-//if (process.env.NODE_ENV === 'production') {
-app.use(express.static('build/'));
+if (process.env.NODE_ENV === 'production') {
+  app.use(express.static('build/'));
 
-app.get('*', (req, res) => {
-  res.sendFile(path.resolve(__dirname, 'build', 'index.html'));
-});
+  app.get('*', (req, res) => {
+    res.sendFile(path.resolve(__dirname, 'build', 'index.html'));
+  });
 
-//}
+} else {
+
+  app.use(pino);
+
+}
 
 // database setup
 mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost/bookfinder', {
@@ -24,7 +28,6 @@ mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost/bookfinder', {
 app.use(bodyParser.urlencoded({
   extended: false
 }));
-app.use(pino);
 
 app.get('/api/greeting', (req, res) => {
   const name = req.query.name || 'World';
