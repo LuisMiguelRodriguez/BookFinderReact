@@ -6,6 +6,14 @@ const app = express();
 const PORT = process.env.PORT || 3001;
 
 require('dotenv').config();
+if (process.env.NODE_ENV === 'production') {
+  app.use(express.statitic('client/build/'));
+
+  app.get('*', (req, res) => {
+    res.sendFile(path.resolve(__dirname, 'client', 'build', 'index.html'));
+  });
+
+}
 
 // database setup
 mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost/bookfinder', {
