@@ -1,6 +1,6 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const pino = require('express-pino-logger')();
+//const pino = require('express-pino-logger')();
 const mongoose = require('mongoose');
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -14,11 +14,8 @@ if (process.env.NODE_ENV === 'production') {
     res.sendFile(path.resolve(__dirname, 'build', 'index.html'));
   });
 
-} else {
-
-  app.use(pino);
-
 }
+//  app.use(pino);
 
 // database setup
 mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost/bookfinder', {
