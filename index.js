@@ -3,7 +3,7 @@ const bodyParser = require('body-parser');
 //const pino = require('express-pino-logger')();
 const mongoose = require('mongoose');
 const app = express();
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 8080;
 const path = require('path');
 
 require('dotenv').config();
@@ -35,5 +35,5 @@ app.get('/api/greeting', (req, res) => {
 });
 
 app.listen(PORT, () =>
-  console.log('Express server is running on localhost:3001')
+  console.log(`Express server is running on localhost:${PORT}`)
 );

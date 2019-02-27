@@ -1,27 +1,10 @@
-import React, {
-  Component
-} from 'react';
-import PropTypes from 'prop-types';
-import {
-  withStyles
-} from '@material-ui/core/styles';
-
-import TextField from '@material-ui/core/TextField';
-import books from 'google-books-search';
-import Button from '@material-ui/core/Button';
-import Icon from '@material-ui/core/Icon';
+import React, { Component } from 'react';
+import { withStyles } from '@material-ui/core/styles';
+import { Grid } from '@material-ui/core/';
 import Card from './components/card.js'
+import Header from './components/Header';
+import Search from './components/Search';
 
-const options = {
-  key: process.env.GOOGLE_API_KEY,
-  field: 'title',
-  offset: 0,
-  limit: 10,
-  type: 'books',
-  order: 'relevance',
-  lang: 'en'
-
-};
 
 const styles = theme => ({
   container: {
@@ -67,8 +50,8 @@ class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      search: 'Professional JavaScript for Web Developers',
-      books: []
+      search: 'Harry Potter',
+      books: false
     };
   }
 
@@ -81,70 +64,69 @@ class App extends Component {
   handleSubmit = () => {
 
     const self = this;
-    books.search(this.state.search, options, function(error, results, apiResponse) {
-      if (!error) {
-        console.log(results);
+
+    fetch(`https://www.googleapis.com/books/v1/volumes?q=${this.state.search}`)
+      .then(results => {
+        return results.json();
+      })
+      .then(data => {
+
+        console.log(data.items)
         self.setState({
-          books: results
-        });
+          books: data.items.map(book => book.volumeInfo)
+        })
 
-      } else {
-        console.log(error);
-
-      }
-
-    });
-
+      })
   }
-  componentDidMount() {}
+
+  keyUp = (e) => {
+
+    if (e.keyCode === 13) {
+      this.handleSubmit();
+    }
+  }
 
   render() {
-    const {
-      classes
-    } = this.props;
+
+    const { search, books } = this.state;
 
     return (
-      <div className="App">
-        <h1>BOOK FINDER</h1>
 
-        <TextField
-                id="outlined-bare"
-                className={classes.textField}
-                value={this.state.search}
-                margin="normal"
-                variant="outlined"
-                onChange={this.handleChange}
-              />
-                    <Button onClick={this.handleSubmit}variant="contained" color="primary" className={classes.button}>
-                              Send
-                                              <Icon className={classes.rightIcon}>send</Icon>
-            </Button>
-             
-            <div style={{display:'flex', flexWrap:'wrap'}}>
-            {this.state.books ? this.state.books.map((book ,i)=>{
-              return(
-                <Card 
-                authors={book.authors}
-                title={book.title}
-                publish={book.publisher}
-                thumbnail={book.thumbnail}
-              />
-              
-              )
-            }):
-                <div> No Books!</div>
-            
-            }
-          </div>
-           
+      <div className="App" onKeyUp={this.keyUp}>
+        <Header />
+        <Search
+          search={search}
+          handleChange={this.handleChange}
+          handleSubmit={this.handleSubmit}
+
+        />
+        <Grid container justify='center' style={{ margin: '10px auto' }}>
+
+          {books ? books.map((book, i) => {
+            return (
+              <Grid item >
+                <Card
+                  key={i}
+                  authors={book.authors}
+                  title={book.title}
+                  publisher={book.publisher}
+                  thumbnail={book.imageLinks.thumbnail}
+                  link={book.previewLink}
+                />
+              </Grid>
+
+            )
+          }) :
+            <div> Please Enter Something In the Search Input!</div>
+
+          }
+        </Grid>
+
       </div>
     );
   }
 }
 
-App.propTypes = {
-  classes: PropTypes.object.isRequired,
 
-};
 
 export default withStyles(styles)(App);
