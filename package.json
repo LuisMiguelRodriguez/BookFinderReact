@@ -21,7 +21,6 @@
     "server": "node-env-run index.js",
     "dev": "run-p server start"
   },
-  "proxy": "http://localhost:8080",
   "eslintConfig": {
     "extends": "react-app"
   },
